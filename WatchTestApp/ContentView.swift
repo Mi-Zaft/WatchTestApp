@@ -31,6 +31,8 @@ struct ContentView: View {
         }.onAppear {
             viewModel.fetchCharacters()
         }
+        
+        
     }
 }
 

@@ -23,9 +23,17 @@ class WatchViewModel: NSObject, ObservableObject {
         }
         
         session.sendMessage(["request": "getCharacters"]) { [weak self] reply in
-            guard let characters = reply["response"] as? [CharacterModel] else { return }
-            DispatchQueue.main.async { [weak self] in
-                self?.characterList = characters
+            
+            if let response = reply["response"] as? [[String: Any]] {
+                do {
+                    let data = try JSONSerialization.data(withJSONObject: response)
+                    let characters = try JSONDecoder().decode([CharacterModel].self, from: data)
+                    DispatchQueue.main.async { [weak self] in
+                        self?.characterList = characters
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                }
             }
         } errorHandler: { error in
             print("Ошибка::: ", error.localizedDescription)

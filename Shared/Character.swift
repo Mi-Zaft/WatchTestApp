@@ -7,11 +7,17 @@
 
 import Foundation
 
-struct CharacterModel: Decodable, Identifiable {
+struct CharacterModel: Codable, Identifiable {
     let id: Int
     let name: String
     let status: String
     let imageUrl: URL?
+    
+    var asDictionary: [String: Any]? {
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else { return nil }
+        return dictionary
+    }
     
     enum CodingKeys: String, CodingKey {
         case id

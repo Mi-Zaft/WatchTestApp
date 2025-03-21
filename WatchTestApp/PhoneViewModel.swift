@@ -18,7 +18,7 @@ class PhoneViewModel: NSObject, ObservableObject {
         activateSession()
     }
     
-    func fetchCharacters(handler: (() -> ())?) {
+    func fetchCharacters(handler: (() -> ())? = nil) {
         let url = URL(string: "https://rickandmortyapi.com/api/character")
         
         URLSession.shared.dataTask(with: url!) { [weak self] data, _, error in
@@ -32,27 +32,6 @@ class PhoneViewModel: NSObject, ObservableObject {
                     DispatchQueue.main.async {
                         self?.characterList = result.results
                         handler?()
-                    }
-                } catch {
-                    print(error.localizedDescription)
-                }
-            }
-        }.resume()
-    }
-    
-    func fetchCharacters() {
-        let url = URL(string: "https://rickandmortyapi.com/api/character")
-        
-        URLSession.shared.dataTask(with: url!) { [weak self] data, _, error in
-            if let error {
-                print(error.localizedDescription)
-            }
-            
-            if let data {
-                do {
-                    let result = try JSONDecoder().decode(CharacterResult.self, from: data)
-                    DispatchQueue.main.async {
-                        self?.characterList = result.results
                     }
                 } catch {
                     print(error.localizedDescription)
@@ -79,8 +58,9 @@ extension PhoneViewModel: WCSessionDelegate {
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         fetchCharacters { [weak self] in
-            print("RESPONSE")
-            replyHandler(["response": self?.characterList ?? []])
+            let dictionaryArray = self?.characterList.compactMap { $0.asDictionary }
+            guard let dictionaryArray else { return }
+            replyHandler(["response": dictionaryArray])
         }
     }
     

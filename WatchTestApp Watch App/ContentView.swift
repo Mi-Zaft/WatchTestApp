@@ -24,9 +24,5 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .sessionActivated)) { _ in
             viewModel.getDataFromPhone()
         }
-        
-        Button("qwe") {
-            viewModel.getDataFromPhone()
-        }
     }
 }
